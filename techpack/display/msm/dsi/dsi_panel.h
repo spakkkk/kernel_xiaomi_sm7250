@@ -127,6 +127,7 @@ struct dsi_backlight_config {
 	u32 bl_scale_sv;
 	u32 bl_doze_lpm;
 	u32 bl_doze_hbm;
+	u32 bl_dimlayer_dc_level;
 	bool bl_inverted_dbv;
 
 	int en_gpio;
@@ -244,6 +245,9 @@ struct dsi_panel {
 
 	struct brightness_alpha_pair *fod_dim_lut;
 	u32 fod_dim_lut_count;
+
+	struct brightness_alpha_pair *bl_dim_lut;
+	u32 bl_dim_lut_count;
 
 	bool doze_enabled;
 	enum dsi_doze_mode_type doze_mode;
@@ -391,4 +395,7 @@ int dsi_panel_set_doze_status(struct dsi_panel *panel, bool status);
 
 int dsi_panel_set_doze_mode(struct dsi_panel *panel, enum dsi_doze_mode_type mode);
 
+int dsi_panel_set_dimlayer_bl_backlight(struct dsi_panel *panel, bool status);
+
+u32 dsi_panel_get_bl_dim_alpha(struct dsi_panel *panel);
 #endif /* _DSI_PANEL_H_ */

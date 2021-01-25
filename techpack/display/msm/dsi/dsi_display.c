@@ -225,6 +225,10 @@ int dsi_display_set_backlight(struct drm_connector *connector,
 	bl_scale_sv = panel->bl_config.bl_scale_sv;
 	bl_temp = (u32)bl_temp * bl_scale_sv / MAX_SV_BL_SCALE_LEVEL;
 
+	if (is_dimlayer_bl_enable) {
+		bl_temp = bl_temp > panel->bl_config.bl_dimlayer_dc_level ? bl_temp : panel->bl_config.bl_dimlayer_dc_level;
+	}
+
 	DSI_DEBUG("bl_scale = %u, bl_scale_sv = %u, bl_lvl = %u\n",
 		bl_scale, bl_scale_sv, (u32)bl_temp);
 	rc = dsi_display_clk_ctrl(dsi_display->dsi_clk_handle,
@@ -5200,9 +5204,62 @@ static ssize_t sysfs_dimlayer_bl_write(struct device *dev,
     return count;
 }
 
+bool is_dimlayer_hbm_enabled;
+static ssize_t sysfs_dimlayer_hbm_read(struct device *dev,
+	struct device_attribute *attr, char *buf)
+{
+    return snprintf(buf, PAGE_SIZE, "%d\n", is_dimlayer_hbm_enabled);
+}
+
+static ssize_t sysfs_dimlayer_hbm_write(struct device *dev,
+	struct device_attribute *attr, const char *buf, size_t count)
+{
+    int enabled = 0;
+    sscanf(buf, "%d", &enabled);
+    is_dimlayer_hbm_enabled = enabled > 0;
+    return count;
+}
+
+bool is_fod_hbm_enabled;
+static ssize_t sysfs_fod_hbm_en_read(struct device *dev,
+	struct device_attribute *attr, char *buf)
+{
+    return snprintf(buf, PAGE_SIZE, "%d\n", is_fod_hbm_enabled);
+}
+
+static ssize_t sysfs_fod_hbm_en_write(struct device *dev,
+	struct device_attribute *attr, const char *buf, size_t count)
+{
+	struct dsi_display *display;
+	struct dsi_panel *panel;
+    int enabled = 0;
+
+	display = dev_get_drvdata(dev);
+	if (!display) {
+		pr_err("Invalid display\n");
+		return -EINVAL;
+	}
+
+    sscanf(buf, "%d", &enabled);
+
+	panel = display->panel;
+
+	is_fod_hbm_enabled = enabled > 0;
+
+	mutex_lock(&panel->panel_lock);
+	dsi_panel_set_fod_hbm(panel, is_fod_hbm_enabled);
+	mutex_unlock(&panel->panel_lock);
+
+    return count;
+}
+
 static DEVICE_ATTR(dimlayer_bl, 0664,
 			sysfs_dimlayer_bl_read,
 			sysfs_dimlayer_bl_write);
+
+static DEVICE_ATTR(dimlayer_hbm, 0664,
+			sysfs_dimlayer_hbm_read,
+			sysfs_dimlayer_hbm_write);
 
 static DEVICE_ATTR(doze_status, 0644,
 			sysfs_doze_status_read,
@@ -5216,11 +5273,17 @@ static DEVICE_ATTR(fod_ui, 0444,
 			sysfs_fod_ui_read,
 			NULL);
 
+static DEVICE_ATTR(fod_hbm_en, 0664,
+			sysfs_fod_hbm_en_read,
+			sysfs_fod_hbm_en_write);
+
 static struct attribute *display_fs_attrs[] = {
 	&dev_attr_doze_status.attr,
 	&dev_attr_doze_mode.attr,
 	&dev_attr_fod_ui.attr,
 	&dev_attr_dimlayer_bl.attr,
+	&dev_attr_dimlayer_hbm.attr,
+	&dev_attr_fod_hbm_en.attr,
 	NULL,
 };
 
