@@ -6348,7 +6348,7 @@ void sde_crtc_touch_notify(void)
 			break;
 		}
 
-		if (dsi_display && dsi_display->is_prim_display && dsi_display->panel
+		if (dsi_display && dsi_display->panel
 			&& !dsi_display->panel->mi_cfg.panel_max_frame_rate) {
 			if (dsi_display->panel->dfps_caps.smart_fps_support && fm_stat.enabled) {
 				dsi_display->panel->mi_cfg.panel_max_frame_rate = true;
