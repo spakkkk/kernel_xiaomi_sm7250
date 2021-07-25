@@ -160,8 +160,9 @@
 	qcom,mdss-dsi-nolp-command-set-backlight-enabled;
 
 	/* AOD brightness setting */
-	mi,mdss-dsi-doze-hbm-brightness-value = <270>;
-	mi,mdss-dsi-doze-lbm-brightness-value = <20>;
+	qcom,mdss-dsi-doze-hbm-brightness-value = <266>;
+	qcom,mdss-dsi-doze-lbm-brightness-value = <20>;
+	qcom,disp-dc-dimlayer-backlight = <260>;
 
 	mi,mdss-panel-fod-hbm-on-need-prepare;
 	mi,mdss-panel-fod-hbm-off-delay;
@@ -189,16 +190,42 @@
 		 2000       0x24
 		 2047       0x21>;
 
+	qcom,disp-bl-dim-lut =
+	/* brightness, alpha */
+		<0          0xff
+		 1          0xE0
+		 2          0xd6
+		 3          0xd5
+		 4          0xcf
+		 5          0xcb
+		 6          0xc9
+		 8          0xc5
+		 10         0xc1
+		 15         0xb6
+		 20         0xac
+		 30         0x9d
+		 45         0x82
+		 70         0x6c
+		 100        0x56
+		 120        0x47
+		 140        0x3a
+		 160        0x2f
+		 180        0x22
+		 200        0x16
+		 220        0xe
+		 240        0x6
+		 260        0x00>;
+
 	qcom,mdss-dsi-display-timings {
 		timing@0{
-			mi,mdss-dsi-doze-hbm-command = [
+			qcom,mdss-dsi-doze-hbm-command = [
 				39 01 00 00 00 00 03 51 01 0E
 			];
-			mi,mdss-dsi-doze-lbm-command = [
+			qcom,mdss-dsi-doze-lbm-command = [
 				39 01 00 00 00 00 03 51 00 14
 			];
-			mi,mdss-dsi-doze-hbm-command-state = "dsi_lp_mode";
-			mi,mdss-dsi-doze-lbm-command-state = "dsi_lp_mode";
+			qcom,mdss-dsi-doze-hbm-command-state = "dsi_lp_mode";
+			qcom,mdss-dsi-doze-lbm-command-state = "dsi_lp_mode";
 
 			qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
 				/* ELVSS dimming off */
@@ -215,16 +242,16 @@
 				39 01 00 00 00 00 03 51 03 FF];
 			qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
 
-			mi,mdss-dsi-hbm-off-command = [
+			qcom,mdss-dsi-hbm-off-command = [
 				15 00 00 00 00 00 02 53 28
 				/* parameter will be updated base on last brightness */
 				39 01 00 00 00 00 03 51 03 FF];
-			mi,mdss-dsi-hbm-off-command-state = "dsi_lp_mode";
-			mi,mdss-dsi-hbm-on-command = [
+			qcom,mdss-dsi-hbm-off-command-state = "dsi_lp_mode";
+			qcom,mdss-dsi-hbm-on-command = [
 				15 01 00 00 00 00 02 53 E8
 				/* HBM ON 700nit */
 				39 01 00 00 00 00 03 51 03 FF];
-			mi,mdss-dsi-hbm-on-command-state = "dsi_lp_mode";
+			qcom,mdss-dsi-hbm-on-command-state = "dsi_lp_mode";
 
 			mi,mdss-dsi-flat-on-command = [
 				/* Level2 key enable */
