@@ -734,7 +734,8 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, zero-length-bounds)
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS   += -Os
 else
-KBUILD_CFLAGS   += -O3
+KBUILD_CFLAGS   += -O3 -march=armv8.1-a+crypto+fp16+rcpc
+KBUILD_AFLAGS   += -O3 -march=armv8.1-a+crypto+fp16+rcpc
 endif
 ifdef CONFIG_LTO_CLANG
 KBUILD_CFLAG	+= -fwhole-program-vtables
