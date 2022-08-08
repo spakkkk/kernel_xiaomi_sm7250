@@ -101,6 +101,7 @@ struct fts_gesture_st {
 *****************************************************************************/
 static struct fts_gesture_st fts_gesture_data;
 extern struct fts_ts_data *fts_data;
+static u8 fts_dttw_on;
 
 /*****************************************************************************
 * Global variable or extern global variabls/functions
@@ -138,7 +139,7 @@ static struct attribute_group fts_gesture_group = {
 static ssize_t double_tap_show(struct kobject *kobj,
                                struct kobj_attribute *attr, char *buf)
 {
-    return sprintf(buf, "%d\n", fts_gesture_data.mode);
+    return sprintf(buf, "%d\n", fts_dttw_on);
 }
 
 static ssize_t double_tap_store(struct kobject *kobj,
@@ -151,7 +152,7 @@ static ssize_t double_tap_store(struct kobject *kobj,
     if (rc)
     return -EINVAL;
 
-    fts_gesture_data.mode = !!val;
+    fts_dttw_on = !!val;
     return count;
 }
 
@@ -567,20 +568,22 @@ int fts_gesture_suspend(struct i2c_client *client)
 		FTS_INFO("gesture is disabled");
 		return -EINVAL;
 	}
-	ret = fts_gesture_reg_write(client, FTS_REG_GESTURE_DOUBLETAP_ON, true);
-	if (ret) {
-		FTS_ERROR("[GESTURE]Enter into gesture(suspend) failed!\n");
-		fts_gesture_data.active = DISABLE;
-		return -EIO;
-	}
+	if (fts_dttw_on == ENABLE) {
+		ret = fts_gesture_reg_write(client, FTS_REG_GESTURE_DOUBLETAP_ON, true);
+		if (ret) {
+			FTS_ERROR("[GESTURE]Enter into gesture(suspend) failed!\n");
+			fts_gesture_data.active = DISABLE;
+			return -EIO;
+		}
 #ifdef CONFIG_TOUCHSCREEN_FTS_FOD
-	ret = fts_fod_reg_write(client, FTS_REG_GESTURE_DOUBLETAP_ON, true);
-	if (ret) {
-		FTS_ERROR("[GESTURE]Enter into gesture(suspend) failed!\n");
-		fts_gesture_data.active = DISABLE;
-		return -EIO;
-	}
+		ret = fts_fod_reg_write(client, FTS_REG_GESTURE_DOUBLETAP_ON, true);
+		if (ret) {
+			FTS_ERROR("[GESTURE]Enter into gesture(suspend) failed!\n");
+			fts_gesture_data.active = DISABLE;
+			return -EIO;
+		}
 #endif
+	}
 	fts_gesture_data.active = ENABLE;
 	FTS_INFO("[GESTURE]Enter into gesture(suspend) successfully!");
 	FTS_FUNC_EXIT();
