@@ -898,6 +898,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 		.matches = has_ssbd_mitigation,
 		.midr_range_list = arm64_ssb_cpus,
 	},
+	{
+		.desc = "Spectre-BHB",
+		.capability = ARM64_SPECTRE_BHB,
+		.type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
+		.matches = is_spectre_bhb_affected,
+		.cpu_enable = spectre_bhb_enable_mitigation,
+	},
 #ifdef CONFIG_ARM64_ERRATUM_1188873
 	{
 		.desc = "ARM erratum 1188873",
@@ -1280,7 +1287,6 @@ void spectre_bhb_enable_mitigation(const struct arm64_cpu_capabilities *entry)
 	} else if (supports_clearbhb(SCOPE_LOCAL_CPU)) {
 		kvm_setup_bhb_slot(__spectre_bhb_clearbhb_start);
 		this_cpu_set_vectors(EL1_VECTOR_BHB_CLEAR_INSN);
-
 		state = SPECTRE_MITIGATED;
 	} else if (spectre_bhb_loop_affected(SCOPE_LOCAL_CPU)) {
 		switch (spectre_bhb_loop_affected(SCOPE_SYSTEM)) {
